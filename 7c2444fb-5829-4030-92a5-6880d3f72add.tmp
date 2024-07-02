@@ -1,0 +1,100 @@
+ rem Generated 22/10/2018 21:47:13 by Visual bB Version 1.0.0.568
+ rem **********************************
+ rem *<filename>                      *
+ rem *<description>                   *
+ rem *<author>                        *
+ rem *<contact info>                  *
+ rem *<license>                       *
+ rem **********************************
+
+
+ playfield:
+................................
+................................
+................................
+................................
+................................
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+................................
+................................
+................................
+................................
+................................
+end
+
+ COLUBK  =  $20
+
+ dim _delay  =  0
+
+
+ player0x = 50
+ player0y = 42
+
+ player1x = 50
+ player1y = 10
+
+ missile0height = 4
+ missile0y = 255
+ missile0y = 255
+
+ NUSIZ0  =  16
+
+sprites
+ player0:
+ %00000000
+ %00000000
+ %00000000
+ %00111110
+ %00111110
+ %00111110
+ %00000000
+ %00000000
+end
+
+
+ player1:
+ %00011110
+ %11110010
+ %10000010
+ %11000110
+ %01000110
+ %01000011
+ %01001111
+ %01111000
+end
+
+ if  ( _delay  >  2 )  then player1y  =  player1y  +  1
+
+
+
+ if missile0y > 100 then goto skip
+ if missile0y <  0 then goto skip
+
+ if missile0y  <  50 then missile0y  =  missile0y - 2 : goto draw_loop
+ if missile0y  >  50 then missile0y  =  missile0y + 2 : goto draw_loop
+
+ player1y  =  player1y  +  1
+
+skip
+ if joy0fire then missile0y  =  player0y : missile0x  =  player0x  +  5
+
+
+draw_loop
+
+ _delay  =  _delay  +  1
+
+ if joy0right then player0x  =  player0x + 1
+ if joy0left then player0x  =  player0x - 1
+ if joy0down then player0y  =  52
+ if joy0up then player0y  =  42
+
+ if collision(missile0,player1) then score  =  score  + 1 : missile0y  =  200 :  player1y  =  150 : player1x  =  rand / 2
+
+
+
+ drawscreen
+ goto sprites
+
+
+
+

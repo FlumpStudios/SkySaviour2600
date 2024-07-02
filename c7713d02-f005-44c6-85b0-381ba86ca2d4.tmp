@@ -1,0 +1,68 @@
+ rem Generated 22/10/2018 21:47:13 by Visual bB Version 1.0.0.568
+ rem **********************************
+ rem *<filename>                      *
+ rem *<description>                   *
+ rem *<author>                        *
+ rem *<contact info>                  *
+ rem *<license>                       *
+ rem **********************************
+
+
+ playfield:
+................................
+................................
+................................
+................................
+................................
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+................................
+................................
+................................
+................................
+................................
+end
+
+ COLUBK  =  $20
+
+
+ player0x = 50
+ player0y = 42
+ missile0height = 4
+ missile0y = 255
+ NUSIZ0  =  16
+
+
+sprites
+ player0:
+ %00000000
+ %00000000
+ %00000000
+ %00111110
+ %00111110
+ %00111110
+ %00000000
+ %00000000
+end
+
+ if missile0y > 240 then goto skip
+ missile0y  =  missile0y - 2 : goto draw_loop
+
+skip
+ if joy0fire then missile0y  =  player0y : missile0x  =  player0x  +  5
+
+
+
+draw_loop
+ if joy0right then player0x  =  player0x + 1
+ if joy0left then player0x  =  player0x - 1
+ if joy0down then player0y  =  52
+ if joy0up then player0y  =  42 :  spr n x y [w h [flip]]
+
+
+
+ drawscreen
+ goto sprites
+
+
+
+

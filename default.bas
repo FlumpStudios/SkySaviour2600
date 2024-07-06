@@ -18,11 +18,11 @@
  ................................
  ................................
  ................................
+ ................................ 
  .XXXXX...XXXXX....XXXXX...XXXXX.
  .X.X.X..XX.X.XX..XX.X.XX..X.X.X.
  .XXXXX..XXXXXXX..XXXXXXX..XXXXX.
- .X.X.X..XX.X.XX..XX.X.XX..X.X.X.
- .XXXXX..XXXXXXX..XXXXXXX..XXXXX.
+ .XXXXX..XXX.XXX..XXXXXXX..XX.XX. 
 end
 
 
@@ -114,37 +114,18 @@ end
  NUSIZ0 = 16 
 
  lives:
- %00000000
- %01100110
- %01111110
+ %00111100
+ %00011000
  %00111100
  %00111100
- %00100100
+ %00111100
+ %00011000
  %00000000
  %00000000
 end
 
- player1:
- %00011000
- %11111000
- %11111110
- %01111110
- %01111110
- %11111111
- %11111111
- %01111000
-end
+ 
 
- player3:
- %00011000
- %11111000
- %11111110
- %01111110
- %01111110
- %11111111
- %11111111
- %01111000
-end
 
 sprites 
  ticker = ticker + 1
@@ -213,73 +194,148 @@ __New_High_Score
 __Skip_High_Score
 
 
-
- player0:
- %00000000 
- %01100110
- %01111110
- %00111100
- %00100100
- %00000000
- %00000000
- %00000000
+ if ticker < 5 then player0: 
+	 %01100110
+	 %11111111
+	 %10111101
+	 %10100101
+	 %00111100
+	 %00011000
+	 %00011000
+	 %00000000
 end
 
+ if ticker >= 5 then player0: 
+	 %00000000
+	 %11111111
+	 %10111101
+	 %10100101
+	 %00111100
+	 %00011000
+	 %00011000
+	 %00000000
+end
+
+ if ticker < 5 then player1:
+   %10011000 
+   %01100110 
+   %00011000 
+   %01111100 
+   %00011000 
+   %00111100
+   %01011010 
+   %00111100 
+end
+
+ if  ticker >= 5 then player1:
+   %00011001 
+   %01100110 
+   %00011000 
+   %00111110 
+   %00011000 
+   %00111100
+   %01011010 
+   %00111100 
+end
  if ticker < 5 then player2:
- %11000011
- %01011010
- %01111110
- %00100100
- %00100100
- %01111110
- %01011010
- %11000011
+ %00000001
+ %10011001
+ %11111111
+ %00111100
+ %11111111
+ %00111100
+ %11100111
+ %10011000
 end
 
  if  ticker >= 5 then player2:
- %01100110
- %01011010
- %01111110
+ %10000000
+ %10011001
+ %11111111
+ %00111100
+ %11111111
+ %00111100
+ %11100111
+ %00011001
+end
+
+ if ticker < 3 then player3: 
+ %10000001
+ %11111111
  %00100100
- %00100100
- %01111110
+ %11000011
  %01011010
- %01100110
+ %01000010
+ %00111100
+ %11100111
+end
+
+ if ticker >=3 && ticker < 6  then player3: 
+ %00000000
+ %11111111
+ %00100100
+ %01000010
+ %11011011
+ %01000010
+ %00111100
+ %11100111
+end
+
+ if ticker >= 6  then player3: 
+ %00000000
+ %01111110
+ %10100101
+ %01000010
+ %01011010
+ %11000011
+ %00111100
+ %11100111
 end
 
 
- if switchSprite > 0 then player2:
-  %01111000
-  %11111111
-  %11111111
-  %01111110
-  %01111110
-  %11111110
-  %11111000
-  %00011000
+ if switchSprite > 0 && ticker < 5 then player2:
+ %00111100
+ %11011011
+ %01011010
+ %11111111
+ %10011001
+ %10100101
+ %11000011
+ %01111110
+end
+
+ if switchSprite > 0 && ticker >= 5 then player2:
+ %01011010
+ %01011010
+ %01011010
+ %11111111
+ %10000001
+ %10100101
+ %11000011
+ %01111110
 end
 
 
  if ticker < 5 then  player4:
- %10000001
- %01000010
- %01111110
+ %00100100
+ %10100101
  %01011010
- %01011010
+ %00111100
  %01111110
+ %10011001
+ %00100100
  %01000010
- %10000001
 end
 
  if ticker >= 5 then player4:
- %01000010
- %01000010
- %01111110
- %01011010
- %01011010
- %01111110
- %01000010
- %01000010
+ %00100100
+ %00100100
+ %11011011
+ %00111100
+ %11111111
+ %00011000
+ %00100100
+ %00100100
 end
 
  if explosionTicker = 1 then player5:
@@ -318,10 +374,10 @@ end
  ;*************************************
  ;* Check if game over conditions met *
  ;************************************* 
- if player1y < 49 then goto gameOver
- if player2y < 49 then goto gameOver
- if player3y < 49 then goto gameOver
- if player4y < 49 then goto gameOver
+ if player1y < 41 then goto gameOver
+ if player2y < 41 then goto gameOver
+ if player3y < 41 then goto gameOver
+ if player4y < 41 then goto gameOver
 
  if missile1y < 10 then missile1y = 200
 
@@ -336,8 +392,8 @@ end
 
 
 skip
- if player0y < 49 && lives < 196 && ticker = 0 then lives = lives + 32: goto draw_loop
- if player0y < 49 then goto draw_loop
+ if player0y < 41 && lives < 196 && ticker = 0 then lives = lives + 32: goto draw_loop
+ if player0y < 41 then goto draw_loop
  if lives < 32 then goto draw_loop
  if joy0fire && player5y > 150 then missile0y = player0y - 4: lives = lives - 32 :missile0x = player0x + 5
 draw_loop
@@ -347,8 +403,8 @@ draw_loop
  if joy0up && player0y < 90 then player0y = player0y+1
  
  
- if player0y < 49 && lives < 196 && ticker < 5 then COLUP0 = $F0 : goto exitColourSwitch
- if player0y < 49 && lives < 196 && ticker > 5 then COLUP0 = $02 : goto exitColourSwitch
+ if player0y < 41 && lives < 196 && ticker < 5 then COLUP0 = $F0 : goto exitColourSwitch
+ if player0y < 41 && lives < 196 && ticker > 5 then COLUP0 = $02 : goto exitColourSwitch
  if lives < 32 then COLUP0 = $62 else COLUP0 = $C6 ; set ship to blue if out of bullets
 
 exitColourSwitch

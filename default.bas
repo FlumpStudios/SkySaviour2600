@@ -67,33 +67,30 @@ end
 ;**************************
 ;        Declarations     *
 ;**************************
+ dim _P0_Luminosity = a.b
  dim asteroidY = player1y.b 
  dim asteroid2Y = player2y.c
  dim asteroid3Y = player3y.d
  dim asteroid4Y = player4y.e
-
+ dim explosionTicker = f 
+ dim realLives = g
  dim misx = missile1x.h
  dim misy = missile1y.i
-
- dim _P0_Luminosity = a.b
+ dim bulletMultiplier = j
+ dim ticker = l
+ dim switchSprite = p
+ dim  firstFrame = r
+ dim _High_Score3 = s 
+ dim _High_Score1 = t
+ dim _High_Score2 = u 
+ dim _resetTicker = x
+ dim gameReady = z  
+ dim _Bit0_Reset_Restrainer = y
+ dim _Bit6_Sequence_Switch = y
  
  dim _sc1 = score
  dim _sc2 = score+1
- dim _sc3 = score+2
-
- dim _Bit0_Reset_Restrainer = y
- dim _Bit6_Sequence_Switch = y
-
- dim explosionTicker = f
- dim _resetTicker = x
- dim gameReady = z  
- dim _High_Score1 = t
- dim _High_Score2 = u 
- dim _High_Score3 = s 
- dim  firstFrame = r
- dim switchSprite = p
- 
- dim ticker = l
+ dim _sc3 = score+2 
  dim titlescreencolor = $F0
 
 
@@ -101,6 +98,7 @@ end
  ;     Assignments     *
  ;**********************
 
+ bulletMultiplier = 0
  _High_Score1 = _sc1
  _High_Score2 = _sc2
  _High_Score3 = _sc3 
@@ -109,9 +107,9 @@ end
  _resetTicker = 0
  switchSprite = 0
  explosionTicker = 0
- scorecolor=$1b
+ scorecolor = $1b
  firstFrame = 0
-
+ realLives = 3
  
 
 sprites 
@@ -131,19 +129,21 @@ colorSetComplete
 
  if player5y < 200 then explosionTicker = explosionTicker + 1
  if explosionTicker > 1 then player5y = 200:explosionTicker = 0: AUDV0 = 0 : AUDC0 = 0 : AUDF0 = 0
+ 
+ if player4y < 80 && missile1y > 150  then missile1y = player4y: missile1x =  player4x - 3
 
- if player4y = 80  && missile1y > 150  then missile1y = player4y: missile1x =  player4x  - 3
- if player4y = 10 && missile1y > 150  then missile1y = player4y: missile1x =  player4x - 3
+ if player3y = 80  && missile1y > 150  then missile1y = player3y: missile1x =  player3x  - 3
 
- if player4y = 70  && missile1y > 150  then missile1y = player4y: missile1x =  player4x  - 3
- if player4y = 20 && missile1y > 150  then missile1y = player4y: missile1x =  player4x - 3
+ if player3y = 70  && missile1y > 150  then missile1y = player3y: missile1x =  player3x  - 3
 
  if missile0y > 30 && missile0y < 60 then AUDV1 = 2 : AUDC1 = 12 : AUDF1 = 7 else AUDV1 = 0 : AUDC1 = 0: AUDF0 = 0
 
  if collision(missile1, player0) then goto gameOver
+ if collision(player0, player1) then goto gameOver
+ if _resetTicker > 0 then goto gameOver
  
  ;if missile1y < 45  then misy = misy + 0.4
- if misy < 150 && _resetTicker = 0  then misy = misy -0.4
+ if misy < 150 && _resetTicker = 0  then misy = misy -0.80
  
 
 titlepage
@@ -162,7 +162,7 @@ titlepage
 gamestart   
    CTRLPF = 1 ;Set the spritre priority
       
-   if firstFrame = 0 then _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1: lives = 192
+   if firstFrame = 0 then _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1: lives = 192: bulletMultiplier = 0
    
  lives:
    %00111100
@@ -372,6 +372,8 @@ end
  ;*************************************
  ;* Check if game over conditions met *
  ;************************************* 
+ if _resetTicker > 0 then goto frameReset
+
  if player1y < 41 then goto gameOver
  if player2y < 41 then goto gameOver
  if player3y < 41 then goto gameOver
@@ -389,17 +391,17 @@ end
  missile0y = missile0y+2:goto draw_loop
 
 
+
 skip
- if player0y < 41 && lives < 196 && ticker = 0 then lives = lives + 32: goto draw_loop
+ if player0y < 41 && lives < 196 && ticker = 0 then lives = lives + 32: bulletMultiplier = bulletMultiplier - 1: goto draw_loop
  if player0y < 41 then goto draw_loop
  if lives < 32 then goto draw_loop
- if joy0fire && player5y > 150 then missile0y = player0y - 4: lives = lives - 32 :missile0x = player0x + 5
+ if joy0fire && player5y > 150 then missile0y = player0y - 4:bulletMultiplier = bulletMultiplier + 1: lives = lives - 32 :missile0x = player0x + 5
 draw_loop
- if joy0right && player0x < 134  then player0x = player0x+1
- if joy0left && player0x > 19  then player0x = player0x-1
- if joy0down && player0y > 10 then player0y = player0y-1
- if joy0up && player0y < 90 then player0y = player0y+1
- 
+ if joy0right && player0x < 134  then player0x = player0x + 1
+ if joy0left && player0x > 19  then player0x = player0x - 1
+ if joy0down && player0y > 10 then player0y = player0y - 1
+ if joy0up && player0y < 90 then player0y = player0y + 1 
  
  if player0y < 41 && lives < 196 && ticker < 5 then COLUP0 = $F0 : goto exitColourSwitch
  if player0y < 41 && lives < 196 && ticker > 5 then COLUP0 = $02 : goto exitColourSwitch
@@ -407,13 +409,8 @@ draw_loop
 
 exitColourSwitch
 
-
-   
-end
-
  if collision(missile0, player1) then goto collisions
 
- 
  /* if player1x < 28 || player1x > 141 then player1x = 60
  if player2x < 28 || player2x > 141 then player2x = 60
  if player3x < 28 || player3x > 141 then player3x = 60
@@ -427,6 +424,8 @@ frameReset
 ;   Set speed levels and level progression  *
 ;********************************************
 
+ if _resetTicker > 0 then goto resetScreen
+  
  if _sc3 < 60 && _sc2 < 1 then goto slow 
 
  if _sc2 < 1 then goto fast
@@ -435,7 +434,6 @@ frameReset
  asteroidY = asteroidY - 0.19  
  asteroid2Y = asteroid2Y - 0.21 
  asteroid3Y = asteroid3Y - 0.22 
- 
  asteroid4Y = asteroid4Y - 0.16 
 
  goto resetScreen
@@ -529,7 +527,7 @@ setPlayer4Color
 collisions
  
  AUDV0 = 12 : AUDC0 = 8 : AUDF0 = 28
- score = score + 1
+ score = score + bulletMultiplier
 
  ;**********************
  ;* spawn explosion*
@@ -558,6 +556,7 @@ collisions
  goto frameReset
 
 gameOver
+ if _resetTicker < 1 then _resetTicker = 1
  if !_Bit6_Sequence_Switch{6} then _P0_Luminosity = _P0_Luminosity + 1 : if _P0_Luminosity >= $20 then _Bit6_Sequence_Switch{6} = 1: _resetTicker = _resetTicker + 1 
  if _Bit6_Sequence_Switch{6} then _P0_Luminosity = _P0_Luminosity - 1 : if _P0_Luminosity <= $12 then _P0_Luminosity = $10 : _Bit6_Sequence_Switch{6} = 0
  AUDV1 = 10 : AUDC1 = 8 : AUDF1 = 25
@@ -591,12 +590,8 @@ resetGame
  missile1y= 200
  COLUBK = $0 
  AUDV1 = 0 : AUDC1 = 0 : AUDF1 = 0
- ; lives = lives - 32 
-
- ;if lives < 32 then gameReady = 0: firstFrame = 0: lives = lives + 96
- 
- gameReady = 0
- firstFrame = 0
+ realLives = realLives - 1
+ if realLives < 1 then gameReady = 0: firstFrame = 0: realLives = 3
  goto resetScreen    
 
 

@@ -9,6 +9,7 @@
  includesfile multisprite_superchip.inc
  set kernel multisprite
  set romsize 8k
+ 
  pfheight=7 
 
  playfield:
@@ -108,24 +109,10 @@ end
  _resetTicker = 0
  switchSprite = 0
  explosionTicker = 0
- scorecolor=$1a
+ scorecolor=$1b
  firstFrame = 0
 
- NUSIZ0 = 16 
-
- lives:
- %00111100
- %00011000
- %00111100
- %00111100
- %00111100
- %00011000
- %00000000
- %00000000
-end
-
  
-
 
 sprites 
  ticker = ticker + 1
@@ -175,7 +162,18 @@ titlepage
 gamestart   
    CTRLPF = 1 ;Set the spritre priority
       
-   if firstFrame = 0 then _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1
+   if firstFrame = 0 then _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1: lives = 192
+   
+ lives:
+   %00111100
+   %00011000
+   %00111100
+   %00111100
+   %00111100
+   %00011000
+   %00000000
+   %00000000
+end
 
    if _sc1 > _High_Score1 then goto __New_High_Score
    if _sc1 < _High_Score1 then goto __Skip_High_Score
@@ -405,7 +403,7 @@ draw_loop
  
  if player0y < 41 && lives < 196 && ticker < 5 then COLUP0 = $F0 : goto exitColourSwitch
  if player0y < 41 && lives < 196 && ticker > 5 then COLUP0 = $02 : goto exitColourSwitch
- if lives < 32 then COLUP0 = $62 else COLUP0 = $C6 ; set ship to blue if out of bullets
+ if lives < 32 then COLUP0 = $40 else COLUP0 = $C6 ; set ship to blue if out of bullets
 
 exitColourSwitch
 
@@ -458,7 +456,7 @@ slow
 
 resetScreen
 
- COLUPF = $40
+ COLUPF = $70 ;$02
  drawscreen
 
  goto sprites
@@ -599,8 +597,6 @@ resetGame
  
  gameReady = 0
  firstFrame = 0
- lives = lives + 192
-
  goto resetScreen    
 
 

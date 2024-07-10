@@ -77,6 +77,7 @@ end
  dim misx = missile1x.h
  dim misy = missile1y.i
  dim bulletMultiplier = j
+ dim killCount = k
  dim ticker = l
  dim switchSprite = p
  dim  firstFrame = r
@@ -96,8 +97,7 @@ end
 
  ;**********************
  ;     Assignments     *
- ;**********************
-
+ ;********************** 
  bulletMultiplier = 0
  _High_Score1 = _sc1
  _High_Score2 = _sc2
@@ -110,6 +110,7 @@ end
  scorecolor = $1b
  firstFrame = 0
  realLives = 3
+ killCount = 0
  
 
 sprites 
@@ -130,17 +131,14 @@ colorSetComplete
  if player5y < 200 then explosionTicker = explosionTicker + 1
  if explosionTicker > 1 then player5y = 200:explosionTicker = 0: AUDV0 = 0 : AUDC0 = 0 : AUDF0 = 0
  
- if player4y < 80 && missile1y > 150  then missile1y = player4y: missile1x =  player4x - 3
-
- if player3y = 80  && missile1y > 150  then missile1y = player3y: missile1x =  player3x  - 3
-
- if player3y = 70  && missile1y > 150  then missile1y = player3y: missile1x =  player3x  - 3
-
+ if player4y < 85 && missile1y > 150  then missile1y = player4y: missile1x =  player4x - 3
+ if player3y < 85 && missile1y > 150  then missile1y = player3y: missile1x =  player3x - 3
+ 
  if missile0y > 30 && missile0y < 60 then AUDV1 = 2 : AUDC1 = 12 : AUDF1 = 7 else AUDV1 = 0 : AUDC1 = 0: AUDF0 = 0
 
- if collision(missile1, player0) then goto gameOver
- if collision(player0, player1) then goto gameOver
- if _resetTicker > 0 then goto gameOver
+ if collision(missile1, player0) then goto killPlayer
+ if collision(player0, player1) then goto killPlayer
+ if _resetTicker > 0 then goto killPlayer
  
  ;if missile1y < 45  then misy = misy + 0.4
  if misy < 150 && _resetTicker = 0  then misy = misy -0.80
@@ -162,7 +160,7 @@ titlepage
 gamestart   
    CTRLPF = 1 ;Set the spritre priority
       
-   if firstFrame = 0 then _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1: lives = 192: bulletMultiplier = 0
+   if firstFrame = 0 then _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1: lives = 192: bulletMultiplier = 0: killCount = 0
    
  lives:
    %00111100
@@ -374,10 +372,10 @@ end
  ;************************************* 
  if _resetTicker > 0 then goto frameReset
 
- if player1y < 41 then goto gameOver
- if player2y < 41 then goto gameOver
- if player3y < 41 then goto gameOver
- if player4y < 41 then goto gameOver
+ if player1y < 41 then goto killPlayer
+ if player2y < 41 then goto killPlayer
+ if player3y < 41 then goto killPlayer
+ if player4y < 41 then goto killPlayer
 
  if missile1y < 10 then missile1y = 200
 
@@ -386,15 +384,12 @@ end
  if missile0y > 100 then goto skip 
  /* if missile0y < 0 then goto skip */
 
-
  ;Move the bullet
- missile0y = missile0y+2:goto draw_loop
-
-
+ missile0y = missile0y+2:goto draw_loop 
 
 skip
- if player0y < 41 && lives < 196 && ticker = 0 then lives = lives + 32: bulletMultiplier = bulletMultiplier - 1: goto draw_loop
- if player0y < 41 then goto draw_loop
+ if player0y < 35 && lives < 196 && ticker = 0 then lives = lives + 32: bulletMultiplier = bulletMultiplier - 1: goto draw_loop
+ if player0y < 35 then goto draw_loop
  if lives < 32 then goto draw_loop
  if joy0fire && player5y > 150 then missile0y = player0y - 4:bulletMultiplier = bulletMultiplier + 1: lives = lives - 32 :missile0x = player0x + 5
 draw_loop
@@ -403,14 +398,14 @@ draw_loop
  if joy0down && player0y > 10 then player0y = player0y - 1
  if joy0up && player0y < 90 then player0y = player0y + 1 
  
- if player0y < 41 && lives < 196 && ticker < 5 then COLUP0 = $F0 : goto exitColourSwitch
- if player0y < 41 && lives < 196 && ticker > 5 then COLUP0 = $02 : goto exitColourSwitch
+ if player0y < 35 && lives < 196 && ticker < 5 then COLUP0 = $F0 : goto exitColourSwitch
+ if player0y < 35 && lives < 196 && ticker > 5 then COLUP0 = $02 : goto exitColourSwitch
  if lives < 32 then COLUP0 = $40 else COLUP0 = $C6 ; set ship to blue if out of bullets
 
 exitColourSwitch
 
  if collision(missile0, player1) then goto collisions
-
+ 
  /* if player1x < 28 || player1x > 141 then player1x = 60
  if player2x < 28 || player2x > 141 then player2x = 60
  if player3x < 28 || player3x > 141 then player3x = 60
@@ -421,40 +416,153 @@ frameReset
 
 
 ;********************************************
-;   Set speed levels and level progression  *
+;                 SCRIPT                    *
 ;********************************************
 
- if _resetTicker > 0 then goto resetScreen
-  
- if _sc3 < 60 && _sc2 < 1 then goto slow 
+ if _resetTicker > 0 then goto resetScreen  
+ if killCount < 5 then goto level1
+ if killCount < 11 then goto level2
+ if killCount < 18 then goto level3
+ if killCount < 26 then goto level4
+ if killCount < 35 then goto level5
+ if killCount < 45 then goto level6
+ if killCount < 56 then goto level7
+ if killCount < 68 then goto level8
+ if killCount < 81 then goto level9
+ if killCount < 95 then goto level10
+ if killCount < 110 then goto level11
+ if killCount < 126 then goto level12
+ if killCount < 143 then goto level13
+ if killCount < 161 then goto level14
+ if killCount < 180 then goto level15
+ if killCount < 200 then goto level16
 
- if _sc2 < 1 then goto fast
+ asteroidY = asteroidY - 0.37
+ asteroid2Y = asteroid2Y - 0.42 
+ asteroid3Y = asteroid3Y - 0.33
+ asteroid4Y = asteroid4Y - 0.24 
+ COLUPF = $68
 
+level16
+ asteroidY = asteroidY - 0.35
+ asteroid2Y = asteroid2Y - 0.40 
+ asteroid3Y = asteroid3Y - 0.31
+ asteroid4Y = asteroid4Y - 0.22
+ COLUPF = $48
+ goto resetScreen
 
- asteroidY = asteroidY - 0.19  
+level15
+  asteroidY = asteroidY - 0.33
+ asteroid2Y = asteroid2Y - 0.38 
+ asteroid3Y = asteroid3Y - 0.29
+ asteroid4Y = asteroid4Y - 0.20
+ COLUPF = $DC
+ goto resetScreen
+
+level14
+ asteroidY = asteroidY - 0.31
+ asteroid2Y = asteroid2Y - 0.35 
+ asteroid3Y = asteroid3Y - 0.27
+ asteroid4Y = asteroid4Y - 0.18
+ COLUPF = $3E
+ goto resetScreen
+
+level13
+  asteroidY = asteroidY - 0.29
+ asteroid2Y = asteroid2Y - 0.33 
+ asteroid3Y = asteroid3Y - 0.25
+ asteroid4Y = asteroid4Y - 0.16
+ COLUPF = $E8
+ goto resetScreen
+
+level12
+ asteroidY = asteroidY - 0.27
+ asteroid2Y = asteroid2Y - 0.31 
+ asteroid3Y = asteroid3Y - 0.23
+ asteroid4Y = asteroid4Y - 0.14
+ COLUPF = $D6
+ goto resetScreen
+
+level11
+ asteroidY = asteroidY - 0.24
+ asteroid2Y = asteroid2Y - 0.29 
+ asteroid3Y = asteroid3Y - 0.21
+ asteroid4Y = asteroid4Y - 0.12
+ COLUPF = $CA
+ goto resetScreen
+
+level10
+ asteroidY = asteroidY - 0.22
+ asteroid2Y = asteroid2Y - 0.27 
+ asteroid3Y = asteroid3Y - 0.19
+ asteroid4Y = asteroid4Y - 0.11
+ COLUPF = $78
+ goto resetScreen
+
+level9
+ asteroidY = asteroidY - 0.20
+ asteroid2Y = asteroid2Y - 0.25 
+ asteroid3Y = asteroid3Y - 0.17
+ asteroid4Y = asteroid4Y - 0.09
+ COLUPF = $66
+ goto resetScreen
+
+level8
+ asteroidY = asteroidY - 0.18 
+ asteroid2Y = asteroid2Y - 0.23 
+ asteroid3Y = asteroid3Y - 0.15
+ asteroid4Y = asteroid4Y - 0.07
+ COLUPF = $38
+ goto resetScreen
+
+level7
+ asteroidY = asteroidY - 0.18 
+ if asteroid2Y < 100 then asteroid2Y = asteroid2Y - 0.23 
+ asteroid3Y = asteroid3Y - 0.15
+ asteroid4Y = asteroid4Y - 0.07
+ COLUPF = $22
+ goto resetScreen
+
+level6
+ asteroidY = asteroidY - 0.16 
+ if asteroid2Y < 100 then asteroid2Y = asteroid2Y - 0.21 
+ asteroid3Y = asteroid3Y - 0.13
+ asteroid4Y = asteroid4Y - 0.05
+ COLUPF = $19
+ goto resetScreen
+
+level5
+ asteroid2Y = asteroid2Y - 0.22 
+ asteroid4Y = asteroid4Y - 0.08
+ asteroidY = asteroidY - 0.18
+ COLUPF = $50
+ goto resetScreen
+
+level4
  asteroid2Y = asteroid2Y - 0.21 
- asteroid3Y = asteroid3Y - 0.22 
- asteroid4Y = asteroid4Y - 0.16 
-
+ asteroid4Y = asteroid4Y - 0.08
+ asteroidY = asteroidY - 0.15
+ COLUPF = $60
  goto resetScreen
 
-fast
- asteroidY = asteroidY - 0.15  
- asteroid2Y = asteroid2Y - 0.17 
- asteroid3Y = asteroid3Y - 0.19  
- asteroid4Y = asteroid4Y - 0.13 
+level3
+ if asteroidY < 100 then asteroidY = asteroidY - 0.15 
+ asteroid2Y = asteroid2Y - 0.21 
+ asteroid4Y = asteroid4Y - 0.08
+ COLUPF = $02
  goto resetScreen
 
+level2
+ asteroidY = asteroidY - 0.15
+ asteroid2Y = asteroid2Y - 0.21 
+  COLUPF = $40
+ goto resetScreen
 
-slow
- asteroidY = asteroidY - 0.13 
- if _sc3  > $03 then asteroid2Y = asteroid2Y - 0.15 
- if _sc3  > $15 then asteroid3Y = asteroid3Y - 0.17  
- if _sc3  > $20  then asteroid4Y = asteroid4Y - 0.1 
+level1
+  asteroid2Y = asteroid2Y - 0.21 
+  COLUPF = $70
 
 resetScreen
-
- COLUPF = $70 ;$02
  drawscreen
 
  goto sprites
@@ -481,11 +589,9 @@ setPlayer2Color
  if ticker = 7 then COLUP2 = $3E
  if ticker = 8 then COLUP2 = $DC
  if ticker = 9 then COLUP2 = $48
- if ticker = 10 then COLUP2 = $68
-  
+ if ticker = 10 then COLUP2 = $68  
  if ticker < 4 then switchSprite = 0
  if ticker >= 4 then switchSprite = 1
-
 
  goto colorSetComplete
 
@@ -523,12 +629,11 @@ setPlayer4Color
 ;* Collision Logic             *
 ;* playfield size is 28 <> 141 *
 ;*******************************
-
 collisions
  
  AUDV0 = 12 : AUDC0 = 8 : AUDF0 = 28
  score = score + bulletMultiplier
-
+ killCount = killCount + 1
  ;**********************
  ;* spawn explosion*
  ;**********************
@@ -555,7 +660,7 @@ collisions
 
  goto frameReset
 
-gameOver
+killPlayer
  if _resetTicker < 1 then _resetTicker = 1
  if !_Bit6_Sequence_Switch{6} then _P0_Luminosity = _P0_Luminosity + 1 : if _P0_Luminosity >= $20 then _Bit6_Sequence_Switch{6} = 1: _resetTicker = _resetTicker + 1 
  if _Bit6_Sequence_Switch{6} then _P0_Luminosity = _P0_Luminosity - 1 : if _P0_Luminosity <= $12 then _P0_Luminosity = $10 : _Bit6_Sequence_Switch{6} = 0

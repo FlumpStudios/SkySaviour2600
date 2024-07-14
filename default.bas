@@ -114,7 +114,7 @@ end
  powerUpInPlay = 0
 sprites 
  ticker = ticker + 1
- if ticker > 10 then COLUBK = $0 : ticker = 0
+ if ticker > 10 then COLUBK = $0 : ticker = 0 :  AUDV0 = 0 : AUDC0 = 0 : AUDF0 = 0 
 
  
  ;**************************************
@@ -134,7 +134,7 @@ colorSetComplete
  
  if missile0y > 30 && missile0y < 60 then AUDV1 = 2 : AUDC1 = 12 : AUDF1 = 7 else AUDV1 = 0 : AUDC1 = 0: AUDF0 = 0
 
- if player0x > (player1x - 20) && player0x < (player1x + 1) && player0y > (player1y - 10) && player0y < (player1y + 15) && powerUpInPlay = 1  then goto handlePickup
+ if player0x > (player1x - 20) && player0x < (player1x + 1) && player0y > (player1y - 10) && player0y < (player1y + 15) then goto handlePickup
 
  if collision(missile1, player0) then goto killPlayer
  if collision(player0, player1) then goto killPlayer
@@ -153,8 +153,9 @@ handlePickup
    player4x = player4x + (ticker * 12)
    score = score + 50
    COLUBK = $1f
-   ticker = 8
+   ticker = 5
    lives = 192   
+   AUDV0 = 12 : AUDC0 = 8 : AUDF0 = 28 
 
 titlepage
  if joy0fire || switchreset then gameReady = 1 
@@ -567,7 +568,8 @@ level2
  goto resetScreen
 
 level1
- asteroid2Y = asteroid2Y - 0.21  
+ asteroidY = asteroidY - 0.15
+ ;asteroid2Y = asteroid2Y - 0.21  
  COLUPF = $70
 
 resetScreen

@@ -6,6 +6,7 @@
  rem *<contact info>                  *
  rem *<license>                       *
  rem ********************************** 
+ 
  includesfile multisprite_superchip.inc
  set kernel multisprite
  set romsize 8k
@@ -26,8 +27,6 @@
  .XXXXX..XXX.XXX..XXXXXXX..XX.XX. 
 end
 
-
- COLUBK = $0  
  _COLUP1 = $3A 
  COLUP2 = $A4 
  COLUP3 = $A4 
@@ -56,8 +55,8 @@ end
 
  player5x=100
  player5y= 200
- missile0y=255
-
+ missile0y=100
+ 
 ;enemy bullet
  missile1y=200
  missile1x=50
@@ -79,7 +78,7 @@ end
  dim bulletMultiplier = l
  dim killCount = m
  dim ticker = n
-
+ dim powerUpInPlay = o
  dim altSprite = p
  dim  firstFrame = r
  dim _High_Score3 = s 
@@ -112,10 +111,10 @@ end
  firstFrame = 0
  realLives = 3
  killCount = 0
- 
+ powerUpInPlay = 0
 sprites 
  ticker = ticker + 1
- if ticker > 10  then ticker = 0
+ if ticker > 10 then COLUBK = $0 : ticker = 0
 
  
  ;**************************************
@@ -127,7 +126,6 @@ sprites
  if player4y = 100 || player5y = 0 then goto setPlayer4Color
 
 colorSetComplete
-
  if player5y < 200 then explosionTicker = explosionTicker + 1
  if explosionTicker > 1 then player5y = 200:explosionTicker = 0: AUDV0 = 0 : AUDC0 = 0 : AUDF0 = 0
  
@@ -136,15 +134,31 @@ colorSetComplete
  
  if missile0y > 30 && missile0y < 60 then AUDV1 = 2 : AUDC1 = 12 : AUDF1 = 7 else AUDV1 = 0 : AUDC1 = 0: AUDF0 = 0
 
+ if player0x > (player1x - 20) && player0x < (player1x + 1) && player0y > (player1y - 10) && player0y < (player1y + 15) && powerUpInPlay = 1  then goto handlePickup
+
  if collision(missile1, player0) then goto killPlayer
  if collision(player0, player1) then goto killPlayer
- if _resetTicker > 0 then goto killPlayer
- 
+ if _resetTicker > 0 then goto killPlayer 
  if missile1y < 150 && _resetTicker = 0  then missile1y = missile1y -1 
+ goto titlepage
+
+handlePickup
+   player1y = 100
+   player2y = 100
+   player3y = 100
+   player4y = 100
+   player1x = player1x + (ticker * 12)
+   player2x = player2x + (ticker * 12)
+   player3x = player3x + (ticker * 12)
+   player4x = player4x + (ticker * 12)
+   score = score + 50
+   COLUBK = $1f
+   ticker = 8
+   lives = 192   
 
 titlepage
  if joy0fire || switchreset then gameReady = 1 
- if gameReady = 1 then  COLUBK = $0 : goto gamestart 
+ if gameReady = 1 then goto gamestart 
  gosub titledrawscreen bank2
  _sc1  = 0
  _sc2  = 0
@@ -158,7 +172,7 @@ titlepage
 gamestart   
    CTRLPF = 1 ;Set the spritre priority
       
-   if firstFrame = 0 then _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1: lives = 192: bulletMultiplier = 0: killCount = 0
+   if firstFrame = 0 then missile0x = 200 : missile0y = 200: _sc1  = 0: _sc2 = 0: _sc3 = 0: firstFrame = 1: lives = 192: bulletMultiplier = 0: killCount = 0
    
  lives:
    %00111100
@@ -210,7 +224,18 @@ end
 	 %00000000
 end
 
- if ticker < 5 then player1:
+ if powerUpInPlay = 1 then player1:
+   %00111110
+   %01100011
+   %01010001
+   %01011101
+   %01010101
+   %01011101
+   %01100011
+   %00111110
+end
+ 
+ if powerUpInPlay = 0 && ticker < 5 then player1:
    %10011000 
    %01100110 
    %00011000 
@@ -221,7 +246,7 @@ end
    %00111100 
 end
 
- if  ticker >= 5 then player1:
+ if powerUpInPlay = 0 && ticker >= 5 then player1:
    %00011001 
    %01100110 
    %00011000 
@@ -231,6 +256,7 @@ end
    %01011010 
    %00111100 
 end
+
  if ticker < 5 then player2:
  %00000001
  %10011001
@@ -332,29 +358,7 @@ end
  %00100100
 end
 
- if explosionTicker = 1 then player5:
- %10010001
- %01011010
- %00100100
- %11011011
- %01011010
- %00100100
- %01011010
- %10001001
-end
-
- if explosionTicker = 2 then player5:
- %10010001
- %01011010
- %00100100
- %01000010
- %01000011
- %00100100
- %01011010
- %10001001
-end
-
- if explosionTicker = 3 then player5:
+ player5:
  %10010001
  %01011010
  %00100100
@@ -379,7 +383,6 @@ end
 
  ;Reset bullet if off screen
  if missile0y > 100 then goto skip 
- /* if missile0y < 0 then goto skip */
 
  ;Move the bullet
  missile0y = missile0y+2:goto draw_loop 
@@ -400,10 +403,8 @@ draw_loop
  if lives < 32 then COLUP0 = $40 else COLUP0 = $C6 ; set ship to blue if out of bullets
 
 exitColourSwitch
-
- ; if collision(missile0, player1) then goto collisions
- if missile0y > 99 then goto frameReset   
- if missile0x > (player1x - 10) && missile0x < player1x && missile0y > player1y - 10 then player1x = player1x + (ticker * 12): player1y = 100: goto collisions
+ if missile0y > 80 then goto frameReset   
+ if missile0x > (player1x - 10) && missile0x < player1x && missile0y > player1y - 10 && powerUpInPlay = 0 then player1x = player1x + (ticker * 12): player1y = 100: goto collisions
  if missile0x > (player2x - 10) && missile0x < player2x && missile0y > player2y - 10 then player2x = player2x + (ticker * 12): player2y = 100: goto collisions
  if missile0x > (player3x - 10) && missile0x < player3x && missile0y > player3y - 10 then player3x = player3x + (ticker * 12): player3y = 100: goto collisions
  if missile0x > (player4x - 10) && missile0x < player4x && missile0y > player4y - 10 then player4y = 100: player4x = 116: goto collisions
@@ -426,7 +427,6 @@ exitPositionCheck
 ;********************************************
 ;                 SCRIPT                    *
 ;********************************************
-
  if _resetTicker > 0 then goto resetScreen  
  if killCount < 5 then goto level1
  if killCount < 11 then goto level2
@@ -460,7 +460,7 @@ level16
  goto resetScreen
 
 level15
-  asteroidY = asteroidY - 0.33
+ asteroidY = asteroidY - 0.33
  asteroid2Y = asteroid2Y - 0.38 
  asteroid3Y = asteroid3Y - 0.29
  asteroid4Y = asteroid4Y - 0.08
@@ -567,18 +567,19 @@ level2
  goto resetScreen
 
 level1
- asteroid2Y = asteroid2Y - 0.21 
- 
+ asteroid2Y = asteroid2Y - 0.21  
  COLUPF = $70
 
 resetScreen
  drawscreen
  
  ; X movements
+ if powerUpInPlay = 1 then goto skipPlayer1
  if asteroidY > 70 then asteroidx = asteroidx + 0.15
  if asteroidY < 70 && asteroidY > 50 then asteroidx = asteroidx - 0.15
  if asteroidY < 50 && asteroidY > 42 then asteroidx = asteroidx + 0.15 
 
+skipPlayer1
  if asteroid4Y > 100 then asteroid4x = 116
  if asteroid4Y < 90 && asteroid4Y > 82 then asteroid4x = asteroid4x - 0.75  
  if asteroid4Y < 80 && asteroid4Y > 72 then asteroid4x = asteroid4x + 0.75
@@ -600,7 +601,7 @@ setPlayer1Color
  if ticker = 4 then _COLUP1 = $CA
  if ticker = 5 then _COLUP1 = $D6
  if ticker = 6 then _COLUP1 = $E8
-
+ if ticker = 7 then powerUpInPlay = 1: _COLUP1 = $1f else powerUpInPlay = 0
  goto colorSetComplete
 
 setPlayer2Color
@@ -649,15 +650,15 @@ setPlayer4Color
  
  goto colorSetComplete
 
-
 ;*******************************
 ;* Collision Logic             *
 ;* playfield size is 28 <> 141 *
 ;*******************************
 collisions 
  player5x = missile0x + 4
- player5y = missile0y + 2
+ player5y = missile0y + 9
  missile0y = 200
+ missile0x = 200
  AUDV0 = 12 : AUDC0 = 8 : AUDF0 = 28 
  score = score + bulletMultiplier
  killCount = killCount + 1
@@ -691,9 +692,8 @@ resetGame
  player4x = 116
  player4y = 100
 
- missile0y=255
- missile0y=255
-
+ missile0y=100
+ 
  _resetTicker = 0 
  missile1y= 200
  COLUBK = $0 

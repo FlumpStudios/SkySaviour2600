@@ -70,7 +70,7 @@ end
  dim asteroid3Y = player3y.d
  dim asteroid4Y = player4y.e
  dim explosionTicker = f 
- ;dim realLives = g
+ dim player3MoveLeft = g
  dim asteroidx = player1x.h
  dim asteroid2x = player2x.i
  dim asteroid3x = player3x.j
@@ -109,7 +109,7 @@ end
  explosionTicker = 0
  scorecolor = $1b
  firstFrame = 0
- ;realLives = 3
+ player3MoveLeft = 1
  killCount = 0
  powerUpInPlay = 0
 sprites 
@@ -120,18 +120,27 @@ sprites
  ;**************************************
  ;     Set random colours on spawn     *
  ;**************************************
- if player1y = 100 || player1y = 0 then goto setPlayer1Color
- if player2y = 100 || player2y = 0 then goto setPlayer2Color
- if player3y = 100 || player4y = 0 then goto setPlayer3Color
- if player4y = 100 || player5y = 0 then goto setPlayer4Color
+ if player1y = 100 then goto setPlayer1Color
+
+completePlayer1ColorSet
+ if player2y = 100 then goto setPlayer2Color
+
+completePlayer2ColorSet
+ if player3y = 100 then goto setPlayer3Color
+
+;completePlayer3ColorSet
+; if player4y = 100 then goto setPlayer4Color
+
 
 colorSetComplete
+ 
  if player5y < 200 then explosionTicker = explosionTicker + 1
  if explosionTicker > 1 then player5y = 200:explosionTicker = 0: AUDV0 = 0 : AUDC0 = 0 : AUDF0 = 0
  
- if player4y < 85 && missile1y > 150  then missile1y = player4y: missile1x =  player4x - 3
+ if player2y < 85 && missile1y > 150 && altSprite = 1 then missile1y = player2y: missile1x =  player2x - 3
  if player3y < 85 && missile1y > 150  then missile1y = player3y: missile1x =  player3x - 3
- 
+ if player4y < 85 && missile1y > 150  then missile1y = player4y: missile1x =  player4x - 3
+
  if missile0y > 30 && missile0y < 60 then AUDV1 = 2 : AUDC1 = 12 : AUDF1 = 7 else AUDV1 = 0 : AUDC1 = 0: AUDF0 = 0
 
  if player0x > (player1x - 20) && player0x < (player1x + 1) && player0y > (player1y - 10) && player0y < (player1y + 15) && powerUpInPlay = 1 then goto handlePowerUp
@@ -378,6 +387,9 @@ end
  if player1y < 41 && powerUpInPlay = 0 then goto killPlayer
  if player1y < 10 && powerUpInPlay = 1 then player1y = 100
  
+ ;make player 4 flash
+ if ticker > 4 then COLUP4 = $40 else COLUP4 = $70
+
  if player2y < 41 then goto killPlayer
  if player3y < 41 then goto killPlayer
  if player4y < 41 then goto killPlayer
@@ -452,14 +464,15 @@ exitPositionCheck
  asteroid2Y = asteroid2Y - 0.42 
  asteroid3Y = asteroid3Y - 0.33
  asteroid4Y = asteroid4Y - 0.08
+ goto resetScreen
 
 level16
  asteroidY = asteroidY - 0.35
  asteroid2Y = asteroid2Y - 0.40 
  asteroid3Y = asteroid3Y - 0.31
  asteroid4Y = asteroid4Y - 0.08
- goto resetScreen
  COLUPF = $60
+ goto resetScreen
 
 level15
  asteroidY = asteroidY - 0.33
@@ -527,21 +540,20 @@ level7
  goto resetScreen
 
 level6
- asteroidY = asteroidY - 0.16 
+ asteroid3Y = asteroid3Y - 0.13 
  if asteroid2Y < 100 then asteroid2Y = asteroid2Y - 0.21 
- asteroid3Y = asteroid3Y - 0.13
- asteroid4Y = asteroid4Y - 0.08
+ asteroidY = asteroidY - 0.18
  goto resetScreen
 
 level5
  asteroid2Y = asteroid2Y - 0.22 
- asteroid4Y = asteroid4Y - 0.08
+ asteroid3Y = asteroid3Y - 0.13
  asteroidY = asteroidY - 0.18
  goto resetScreen
 
 level4
  asteroid2Y = asteroid2Y - 0.21 
- asteroid4Y = asteroid4Y - 0.08
+ asteroid3Y = asteroid3Y - 0.13
  asteroidY = asteroidY - 0.15
  COLUPF = $40
  goto resetScreen
@@ -549,12 +561,12 @@ level4
 level3
  if asteroidY < 100 then asteroidY = asteroidY - 0.15 
  asteroid2Y = asteroid2Y - 0.21 
- asteroid4Y = asteroid4Y - 0.08
+ asteroid3Y = asteroid3Y - 0.13
  goto resetScreen
 
 level2
   asteroid2Y = asteroid2Y - 0.21 
-  asteroidY = asteroidY - 0.15
+  asteroidY = asteroidY - 0.25
  goto resetScreen
 
 level1
@@ -566,10 +578,11 @@ resetScreen
  drawscreen
  
  ; X movements
+ if _resetTicker > 0 then goto sprites
  if powerUpInPlay = 1 then goto skipPlayer1
  if asteroidY > 70 then asteroidx = asteroidx + 0.15
  if asteroidY < 70 && asteroidY > 50 then asteroidx = asteroidx - 0.15
- if asteroidY < 50 && asteroidY > 42 then asteroidx = asteroidx + 0.15 
+ if asteroidY < 50 && asteroidY > 42 then asteroidx = asteroidx + 0.15
 
 skipPlayer1
  if asteroid4Y > 100 then asteroid4x = 116
@@ -577,8 +590,14 @@ skipPlayer1
  if asteroid4Y < 80 && asteroid4Y > 72 then asteroid4x = asteroid4x + 0.75
  if asteroid4Y < 70 && asteroid4Y > 62 then asteroid4x = asteroid4x - 0.75
  if asteroid4Y < 60 && asteroid4Y > 52 then asteroid4x = asteroid4x + 0.75 
- if asteroid4Y < 50 && asteroid4Y > 42 then asteroid4x = asteroid4x - 0.75 
+ if asteroid4Y < 50 && asteroid4Y > 42 then asteroid4x = asteroid4x - 0.75
+
  
+ if asteroid3x < 30 then player3MoveLeft = 0
+ if asteroid3x > 120 then player3MoveLeft = 1
+
+ if player3MoveLeft = 1 then asteroid3x = asteroid3x - 0.15 else asteroid3x = asteroid3x + 0.15
+
  if altSprite = 0 || player2y > 90 then goto sprites
  if player2x - 7 > player0x then asteroid2x = asteroid2x - 0.5
  if player2x - 7 < player0x then asteroid2x = asteroid2x + 0.5
@@ -593,25 +612,15 @@ setPlayer1Color
  if ticker = 4 then _COLUP1 = $CA
  if ticker = 5 then _COLUP1 = $D6
  if ticker = 6 then _COLUP1 = $E8
- if ticker = 7 then powerUpInPlay = 1: _COLUP1 = $1f else powerUpInPlay = 0
- goto colorSetComplete
+ if ticker = 7 || ticker = 3 then powerUpInPlay = 1: _COLUP1 = $1f else powerUpInPlay = 0
+ goto completePlayer1ColorSet
 
 setPlayer2Color
- if ticker = 0 then COLUP2 = $22
- if ticker = 1 then COLUP2 = $38
- if ticker = 2 then COLUP2 = $66
- if ticker = 3 then COLUP2 = $78
- if ticker = 4 then COLUP2 = $CA
- if ticker = 5 then COLUP2 = $D6
- if ticker = 6 then COLUP2 = $E8
- if ticker = 7 then COLUP2 = $3E
- if ticker = 8 then COLUP2 = $DC
- if ticker = 9 then COLUP2 = $48
- if ticker = 10 then COLUP2 = $68  
- if ticker < 4 then altSprite = 0
- if ticker >= 4 && killCount > 26 then altSprite = 1
+ if ticker > 5 then COLUP2 = $68 else COLUP2 = $22
+ if ticker < 5 then altSprite = 0
+ if ticker >= 5 && killCount > 26 then altSprite = 1
 
- goto colorSetComplete
+ goto completePlayer2ColorSet
 
 setPlayer3Color
  if ticker = 0 then COLUP3 = $22
@@ -625,21 +634,10 @@ setPlayer3Color
  if ticker = 8 then COLUP3 = $DC
  if ticker = 9 then COLUP3 = $48
  if ticker = 10 then COLUP3 = $68
- goto colorSetComplete
+ if ticker > 4 then player3MoveLeft  = 1 else player3MoveLeft = 0
 
-setPlayer4Color
- if ticker = 0 then COLUP4 = $22
- if ticker = 1 then COLUP4 = $38
- if ticker = 2 then COLUP4 = $66
- if ticker = 3 then COLUP4 = $78
- if ticker = 4 then COLUP4 = $CA
- if ticker = 5 then COLUP4 = $D6
- if ticker = 6 then COLUP4 = $E8
- if ticker = 7 then COLUP4 = $3E
- if ticker = 8 then COLUP4 = $DC
- if ticker = 9 then COLUP4 = $48
- if ticker = 10 then COLUP4 = $68
- 
+  
+ ;goto colorSetComplete
  goto colorSetComplete
 
 ;*******************************

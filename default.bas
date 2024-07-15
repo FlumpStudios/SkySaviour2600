@@ -563,7 +563,7 @@ level4
  goto resetScreen
 
 level3
- if asteroidY < 100 then asteroidY = asteroidY - 20.0
+ if asteroidY < 100 then asteroidY = asteroidY - 0.20
  asteroid2Y = asteroid2Y - 0.30 
  asteroid3Y = asteroid3Y - 0.10
  goto resetScreen
@@ -609,13 +609,7 @@ skipAsteroid3xMovement
  goto sprites
 
 setPlayer1Color
- if ticker = 0 then _COLUP1 = $22
- if ticker = 1 then _COLUP1 = $38
- if ticker = 2 then _COLUP1 = $66
- if ticker = 3 then _COLUP1 = $78
- if ticker = 4 then _COLUP1 = $CA
- if ticker = 5 then _COLUP1 = $D6
- if ticker = 6 then _COLUP1 = $E8
+ if ticker < 5 then _COLUP1 = $22 else _COLUP1 = $38
  if ticker = 7 then powerUpInPlay = 1: _COLUP1 = $1f else powerUpInPlay = 0
  goto completePlayer1ColorSet
 

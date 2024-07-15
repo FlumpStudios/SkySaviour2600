@@ -39,7 +39,7 @@ end
 ;      Sprite setups      *
 ;**************************
  player0x=76
- player0y=30
+ player0y=45
 
  player1x=76
  player1y=115 
@@ -83,6 +83,7 @@ end
  dim ticker = n
  dim powerUpInPlay = o
  dim altSprite = p
+ dim fireEnabled = q 
  dim  firstFrame = r
  dim _High_Score3 = s 
  dim _High_Score1 = t
@@ -114,9 +115,10 @@ end
  player3MoveLeft = 1
  killCount = 0
  powerUpInPlay = 0
+ fireEnabled = 0
 sprites 
  ticker = ticker + 1
- if ticker > 10 then COLUBK = $0 : ticker = 0 :  AUDV0 = 0 : AUDC0 = 0 : AUDF0 = 0 
+ if ticker > 10 then COLUBK = $0 : ticker = 0 : fireEnabled = 1: AUDV0 = 0 : AUDC0 = 0 : AUDF0 = 0 
 
  
  ;**************************************
@@ -408,7 +410,7 @@ skip
  if player0y < 35 && lives < 196 && ticker = 0 then lives = lives + 32: AUDV1 = 2 : AUDC1 = 6 : AUDF1 = 5: bulletMultiplier = bulletMultiplier - 1: goto draw_loop
  if player0y < 35 then goto draw_loop
  if lives < 32 then goto draw_loop
- if joy0fire && player5y > 150 then missile0y = player0y - 4:bulletMultiplier = bulletMultiplier + 1: lives = lives - 32 :missile0x = player0x + 5
+ if joy0fire && fireEnabled = 1 && player5y > 150 then missile0y = player0y - 4:bulletMultiplier = bulletMultiplier + 1: lives = lives - 32 :missile0x = player0x + 5
 draw_loop
  if joy0right && player0x < 134  then player0x = player0x + 1
  if joy0left && player0x > 19  then player0x = player0x - 1
@@ -634,8 +636,6 @@ setPlayer3Color
  if ticker = 10 then COLUP3 = $68
  if ticker > 4 then player3MoveLeft  = 1 else player3MoveLeft = 0
 
-  
- ;goto colorSetComplete
  goto colorSetComplete
 
 ;*******************************
@@ -666,7 +666,7 @@ killPlayer
 resetGame
 
  player0x=75
- player0y=30
+ player0y=45
 
  player1x=76
  player1y=115 
@@ -683,19 +683,16 @@ resetGame
  missile0y=100
  missile0x=140
 
- 
+ ticker = 0
  _resetTicker = 0 
+ fireEnabled = 0
  missile1y= 200
  COLUBK = $0 
  AUDV1 = 0 : AUDC1 = 0 : AUDF1 = 0
- ;realLives = realLives - 1
- ;if realLives < 1 then gameReady = 0: firstFrame = 0: realLives = 3
  gameReady = 0
  firstFrame = 0
  altSprite = 0
-
- goto resetScreen    
-
+ goto resetScreen
 
  bank 2 
  asm
